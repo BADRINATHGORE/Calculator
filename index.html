@@ -1,86 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Responsive Calculator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Base styles for all devices */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 20px; /* Add some padding for smaller screens */
-            box-sizing: border-box; /* Include padding in element's total width and height */
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prismatic Gradient-Border Calculator</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #8e2de2, #ff6a95);
+  }
+  .calculator {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    width: 520px;
+    max-width: 95%;
+    border: 6px solid transparent;
+    border-image: linear-gradient(45deg, #FFD700, #00FFFF, #FF69B4, #7B68EE) 1;
+  }
+  .display {
+    width: 100%;
+    height: 130px;
+    border: none;
+    background: #222;
+    color: #0ff;
+    font-size: 3.8rem;
+    text-align: right;
+    padding: 0 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-sizing: border-box;
+  }
+  .keys {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 12px;
+    padding: 20px;
+  }
+  .keys button {
+    font-size: 2.2rem;
+    padding: 28px;
+    border: 4px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: filter 0.2s, transform .1s;
+    border-image-slice: 1;
+  }
+  /* Numbers */
+  .keys button:not(.operator):not(.clear):not(.back):not(.equal) {
+    background: #ffee93;
+    border-image-source: linear-gradient(to right, #ffd43b, #ffa94d);
+  }
+  /* Operators (+ – × ÷ %) */
+  .keys button.operator {
+    background: #74c0fc;
+    color: #fff;
+    border-image-source: linear-gradient(to right, #4dabf7, #1864ab);
+  }
+  /* Equal (=) */
+  .keys button.equal {
+    background: #ff8787;
+    color: #fff;
+    grid-column: span 2;
+    border-image-source: linear-gradient(to right, #fa5252, #c92a2a);
+  }
+  /* AC */
+  .keys button.clear {
+    background: #ffb703;
+    color: #fff;
+    border-image-source: linear-gradient(to right, #fb8500, #c2410c);
+  }
+  /* Back (⌫) */
+  .keys button.back {
+    background: #00b894;
+    color: #fff;
+    border-image-source: linear-gradient(to right, #009670, #056e46);
+  }
+  .keys button:hover {
+    filter: brightness(0.9);
+    transform: translateY(2px);
+  }
+  .footer {
+    margin-top: 30px;
+    font-size: 1.1rem;
+    color: #fff;
+    text-align: center;
+    opacity: 0.85;
+  }
+  @media (max-width: 600px) {
+    .display { height: 100px; font-size: 2.8rem; }
+    .keys button { font-size: 1.8rem; padding: 22px; }
+    .footer { font-size: 0.9rem; margin-top: 20px; }
+  }
+</style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" id="display" class="display" disabled>
+    <div class="keys">
+      <button class="clear" onclick="clearAll()">AC</button>
+      <button class="back" onclick="backspace()">⌫</button>
+      <button class="operator" onclick="appendOp('%')">%</button>
+      <button class="operator" onclick="appendOp('/')">÷</button>
+      <button onclick="appendNum('7')">7</button>
+      <button onclick="appendNum('8')">8</button>
+      <button onclick="appendNum('9')">9</button>
+      <button class="operator" onclick="appendOp('*')">×</button>
+      <button onclick="appendNum('4')">4</button>
+      <button onclick="appendNum('5')">5</button>
+      <button onclick="appendNum('6')">6</button>
+      <button class="operator" onclick="appendOp('-')">−</button>
+      <button onclick="appendNum('1')">1</button>
+      <button onclick="appendNum('2')">2</button>
+      <button onclick="appendNum('3')">3</button>
+      <button class="operator" onclick="appendOp('+')">+</button>
+      <button onclick="appendNum('0')">0</button>
+      <button onclick="appendNum('.')">.</button>
+      <button class="equal" onclick="calculate()">=</button>
+    </div>
+  </div>
+  <div class="footer">
+    Designed by <strong>Badrinath Gore</strong> | &copy; 2025
+  </div>
 
-        .calculator {
-            border: 1px solid #cce7e1;
-            border-radius: 10px;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            width: 100%; /* Default to full width, adjusted by max-width */
-            max-width: 320px; /* Max width for larger screens to keep it compact */
-            box-sizing: border-box;
-        }
-
-        .display {
-            width: 100%;
-            height: 60px; /* Taller display for better readability */
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 2.5em; /* Larger font size for display */
-            text-align: right;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            background-color: #eef2f1;
-            color: #333;
-            box-sizing: border-box;
-            overflow: hidden; /* Prevent text overflow */
-            white-space: nowrap; /* Keep text on single line */
-        }
-
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px; /* Consistent gap */
-        }
-
-        .button {
-            width: 100%; /* Buttons take full width of their grid cell */
-            padding: 20px 0; /* Vertical padding, horizontal handled by grid */
-            font-size: 1.5em; /* Larger button text */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #e9ecef;
-            color: #333;
-            transition: background-color 0.2s, transform 0.1s;
-            touch-action: manipulation; /* Improve touch responsiveness */
-        }
-
-        .button:hover {
-            background-color: #dee2e6;
-        }
-
-        .button:active {
-            transform: scale(0.98); /* Slight press effect */
-        }
-
-        .button.operator {
-            background-color: #20c997; /* Teal operator buttons */
-            color: white;
-        }
-
-        .button.operator:hover {
-            background-color: #1aae82;
-        }
-
-        .button.equals {
-            background-color: #007bff; /* Blue equals button */
-            color: white;
-            grid-column: span 2; /* Spans two columns */
+<script>
+let entry = '';
+function appendNum(n){ if(n==='.'&&entry.slice(-1)==='.') return; entry+=n; update();}
+function appendOp(o){ if(!entry||/[+\-*/.%]$/.test(entry)) return; entry+=o; update();}
+function clearAll(){ entry=''; update();}
+function backspace(){ entry=entry.slice(0,-1); update();}
+function calculate(){
+  try {
+    const expr = entry.replace(/×/g,'*').replace(/÷/g,'/').replace(/%/g,'/100');
+    entry = eval(expr).toString();
+    update();
+  } catch {
+    entry='Error'; update(); entry='';
+  }
+}
+function update(){ document.getElementById('display').value = entry; }
+window.addEventListener('keydown', e => {
+  if((e.key>='0'&&e.key<='9')||e.key==='.') appendNum(e.key);
+  if(['+','-','*','/','%'].includes(e.key)) appendOp(e.key);
+  if(e.key==='Enter'||e.key==='=') calculate();
+  if(e.key==='Backspace') backspace();
+  if(e.key.toLowerCase()==='c') clearAll();
+});
+</script>
+</body>
+</html>
